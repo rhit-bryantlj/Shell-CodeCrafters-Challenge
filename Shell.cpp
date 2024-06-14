@@ -35,24 +35,26 @@ void handle_type_command(std::vector<std::string> arguments, std::vector<std::st
 }
 
 void handle_change_directory(std::string directory){
-  if(directory[0] == '.'){ // relative path or home directory path search
+  // relative path or home directory path search
+  if(directory[0] == '.'){ 
     std::vector<std::string> split_dir = split_string(directory, '/');
     int dir_it = 0;
-    if(split_dir[0] == ".") // should handle for starting at current ex ./dir/dir2
+    // handle starting at current directory ex ./dir/dir2
+    // TODO: implement a way to handle implicit cur directory ex: cd dir/dir2
+    if(split_dir[0] == ".") 
       dir_it == 1;
     std::filesystem::path cur = std::filesystem::current_path();
     while(dir_it < split_dir.size()){
       if(split_dir[dir_it] == ".."){
-        std::filesystem::current_path(cur.parent_path());
-        cur = std::filesystem::current_path();
+        cur = cur.parent_path();
       } else {
         cur.append(split_dir[dir_it]);
         if(!std::filesystem::exists(cur)){
           std::cout << "cd: " << directory << ": No such file or directory\n";
           break;
         }
-        std::filesystem::current_path(cur);
       }
+      std::filesystem::current_path(cur);
       dir_it++;
     }
   } else if(directory[0] == '~'){ // HOME directory
@@ -89,12 +91,7 @@ int main() {
     arguments = split_string(input, ' ');
 
     if(arguments[0] == "echo"){
-      for(int i = 1; i < arguments.size(); i++){
-        if(i == arguments.size() -1)
-          std::cout << arguments[i] << "\n";
-        else
-          std::cout << arguments[i] << " ";
-      }
+      std::cout << input.substr(input.find(" ") + 1) << "\n";
     }else if(arguments[0] == "type"){
       handle_type_command(arguments, path);
     } else if(arguments[0] == "pwd"){

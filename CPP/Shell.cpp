@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 std::vector<std::string> split_string(const std::string &s, char delimiter){
-   std::stringstream ss(s);
+    std::stringstream ss(s);
     std::vector<std::string> return_vect;
     std::string token;
     while(getline(ss, token, delimiter)){
@@ -34,32 +34,9 @@ void handle_type_command(std::vector<std::string> arguments, std::vector<std::st
   }
 }
 
-void handle_change_directory(std::string directory){
-  // relative path or home directory path search
-  if(directory[0] == '.'){ 
-    std::vector<std::string> split_dir = split_string(directory, '/');
-    int dir_it = 0;
-    // handle starting at current directory ex ./dir/dir2
-    // TODO: implement a way to handle implicit cur directory ex: cd dir/dir2
-    if(split_dir[0] == ".") 
-      dir_it == 1;
-    std::filesystem::path cur = std::filesystem::current_path();
-    while(dir_it < split_dir.size()){
-      if(split_dir[dir_it] == ".."){
-        cur = cur.parent_path();
-      } else {
-        cur.append(split_dir[dir_it]);
-        if(!std::filesystem::exists(cur)){
-          std::cout << "cd: " << directory << ": No such file or directory\n";
-          break;
-        }
-      }
-      std::filesystem::current_path(cur);
-      dir_it++;
-    }
-  } else if(directory[0] == '~'){ // HOME directory
-    std::string home = getenv("HOME");
-    std::filesystem::current_path(home);
+void handle_change_directory(std::string directory){ 
+  if(directory[0] == '~'){ // HOME directory
+    std::filesystem::current_path(getenv("HOME"));
   } else { // Absolue Filepath
     std::filesystem::path path(directory);
     if(std::filesystem::is_directory(path))
@@ -67,7 +44,6 @@ void handle_change_directory(std::string directory){
     else
       std::cout << "cd: " << directory << ": No such file or directory\n";
   }
-  
 }
 
 int main() {
@@ -99,7 +75,10 @@ int main() {
       std::string print_cwd = cwd.substr(0, cwd.length());
       std::cout << print_cwd << "\n";
     } else if(arguments[0] == "cd") {
-      handle_change_directory(arguments[1]);
+      if(arguments.size() > 2)
+        std::cout << "cd: too many arguments\n";
+      else
+        handle_change_directory(arguments[1]);
     } else {
       std::string filepath;
       for(int i = 0; i < path.size(); i++){

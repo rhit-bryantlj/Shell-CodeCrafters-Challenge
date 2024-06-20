@@ -30,14 +30,18 @@ std::string checkFileInPath(std::string filename, std::vector<std::string> path_
 }
 
 void handle_type_command(std::vector<std::string> arguments, std::vector<std::string> path){
-  if(arguments[1] == "echo" || arguments[1] == "exit" || arguments[1] == "type" || arguments[1] == "pwd" || arguments[1] == "cd"){
-        std::cout << arguments[1] << " is a shell builtin\n";
-  }else{
-    std::string filepath = checkFileInPath(arguments[1], path);
-    if(filepath.length() != 0)
-      std::cout << arguments[1] << " is " << filepath << "\n";
-    else
-      std::cout << arguments[1] << ": not found\n";
+  // handle multiple types like a shell: ex 'type exit echo type ls cat' will return 5 lines similar to a single
+  // TODO figure out but why cant do a file executable after a builtin
+  for(int i = 1; i < arguments.size(); i++){
+    if(arguments[i] == "echo" || arguments[i] == "exit" || arguments[i] == "type" || arguments[i] == "pwd" || arguments[i] == "cd"){
+      std::cout << arguments[i] << " is a shell builtin\n";
+    }else{
+      std::string filepath = checkFileInPath(arguments[1], path);
+      if(filepath.length() != 0)
+        std::cout << arguments[i] << " is " << filepath << "\n";
+      else
+        std::cout << arguments[i] << ": not found\n";
+    }
   }
 }
 
